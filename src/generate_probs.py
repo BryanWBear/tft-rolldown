@@ -25,7 +25,7 @@ CHAMPIONS_PER_TIER = {
 
 
 class Simulator:
-    def __init__(self, success_criteria, level=5, copies_already_held: dict={}, champions_missing:dict ={}, semantics='and') -> None: # TODO: can consolidate copies held / champs missing.
+    def __init__(self, success_criteria, level=5, copies_already_held: dict={}, champions_missing:dict ={}, semantics='and', debug=False) -> None: # TODO: can consolidate copies held / champs missing.
         self.unweighted_probs = {
             1: [29]*13,
             2: [22]*13,
@@ -41,6 +41,7 @@ class Simulator:
         print(self.unweighted_probs)
         self.level = level
         self.semantics = semantics
+        self.debug = debug
         assert self.semantics in ['and', 'or']
 
     def remove_champions(self):
@@ -78,30 +79,43 @@ class Simulator:
         unwanted = []
         for _ in range(5):
             tier, champion = self.get_card()
+            if self.debug: # too lazy to use a logging library
+                print(f'tier, champion drawn: {tier}, {champion}')
             # print(tier, champion)
             self.unweighted_probs[tier][champion] -= 1
+            if self.debug:
+                print(f'unweighted probs after draw: {self.unweighted_probs}')
             if (tier, champion) not in success_dict:
                 unwanted.append((tier, champion))
             else:
                 success_dict[(tier, champion)] += 1
+                if self.debug:
+                    print(f'success dict after draw: {success_dict}')
 
         # print(self.unweighted_probs)
         # print(success_dict)
         
         for tier, champion in unwanted: # put champions back into the shop if we didn't pick them up.
             self.unweighted_probs[tier][champion] += 1
+        
+        if self.debug:
+            print(f'unweighted probs after putting back: {self.unweighted_probs}')
 
         # print(self.unweighted_probs)
 
 
     def is_successful(self, success_dict, success_criteria):
-        successes = zip(success_dict.values(), success_criteria.values())
+        successes = list(zip(success_dict.values(), success_criteria.values()))
         if self.semantics == 'and':
-            if all(current > expected for current, expected in successes):
+            if all(current >= expected for current, expected in successes):
+                if self.debug:
+                    print(f'success dict: {success_dict}')
+                    print(f'success_criteria: {success_criteria}')
+                    print(f'success dict values zipped: {successes}')
                 return True
             return False
         elif self.semantics == 'or':
-            if any(current > expected for current, expected in successes):
+            if any(current >= expected for current, expected in successes):
                 return True
             return False      
 
@@ -142,13 +156,13 @@ class Simulator:
         
 
 if __name__ == '__main__':
-    N = 100000
+    N = 1
     probs = {}
     for level in [7]:
         success_criteria =  {(4, 0): 1} #, (4, 1): 3, (4, 2): 3, (4, 3): 3}
         copies_already_held =  {(4, 0): 2}
         champions_missing = {} # {1: 40, 2: 20, 3: 10}
-        sim = Simulator(success_criteria, level=level, copies_already_held=copies_already_held, champions_missing=champions_missing, semantics='or')
+        sim = Simulator(success_criteria, level=level, copies_already_held=copies_already_held, champions_missing=champions_missing, semantics='and', debug=True)
         # probs[level] = []
         # for i in trange(20, 70, 2):
         #     prob = sim.simulate(success_criteria, i, n=N) / N
