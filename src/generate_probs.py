@@ -159,8 +159,8 @@ if __name__ == '__main__':
     N = 1
     probs = {}
     for level in [7]:
-        success_criteria =  {(4, 0): 1} #, (4, 1): 3, (4, 2): 3, (4, 3): 3}
-        copies_already_held =  {(4, 0): 2}
+        success_criteria =  {(3, 0): 1} #, (4, 1): 3, (4, 2): 3, (4, 3): 3}
+        copies_already_held =  {(3, 0): 2}
         champions_missing = {} # {1: 40, 2: 20, 3: 10}
         sim = Simulator(success_criteria, level=level, copies_already_held=copies_already_held, champions_missing=champions_missing, semantics='and', debug=True)
         # probs[level] = []
