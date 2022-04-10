@@ -2,3 +2,4 @@
 *.pyc
 data
 distributions
+src/params_mapping.csv

@@ -5,6 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 LEVEL_TO_PROBS = {
+    3: [.75, .25, 0, 0, 0],
     4: [.55, .3, .15, 0, 0],
     5: [.45, .33, .2, .02, 0],
     6: [.25, .4, .3, .05, 0],
